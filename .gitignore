@@ -1,0 +1,7 @@
+*.json
+*.db
+interview_refactoring.py
+*.pdf
+.idea
+**__pycache__
+venv
