@@ -42,10 +42,10 @@ Load data into the created database and answer the following questions:
 • find the recfile which has the most labels with at least 0.6 confidence
 """
 
-recfiles = ['labeling.json', 'labeling1.json', 'labeling2.json']
+rec_files = ['labeling.json', 'labeling1.json', 'labeling2.json']
 recfile_confidences = dict()
 
-for recfile in recfiles:
+for recfile in rec_files:
     with open(recfile, 'r') as file:
         data = json.loads(file.read())
     sorted_dict = dict(sorted(data.items(), key=lambda item: item[1]['confidence']))
