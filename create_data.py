@@ -21,20 +21,25 @@ def generate_data_files():
         speed = np.concatenate((np.array([0]), speed_asc, speed_desc, np.array([0])))
         distance_km = list(np.linspace(100, 104, num=size).astype(float))
         confidence = np.random.uniform(0, 1, size=size)
-
         timestamp_list = [datetime.timestamp(datetime.strptime(str(x), "%Y-%m-%d  %H:%M:%S.%f")) for x in
                           timestamp_list]
         json_labels_list = list(zip(timestamp_list, cycle(labels), cycle(countries), confidence))
-        json_labels = {x[0]: {'time_stamp': x[1][0], 'label': x[1][1], "confidence": x[1][3]} for x in
+        json_labels = {x[0]: {'id': x[0], 'label': x[1][1], "confidence": x[1][3]} for x in
                        enumerate(json_labels_list)}
         with open(file, 'w') as labels_file:
             json.dump(json_labels, labels_file)
 
-        data_dict = {timestamp_list.index(x): {"time_stamp": x, "speed": speed[timestamp_list.index(x)],
-                                               "distance_km": distance_km[timestamp_list.index(x)],
-                                               "country": json_labels_list[timestamp_list.index(x)][2],
-                                               "image": f'image{random.randint(0, 1000)}.jpg'} for x in
-                     timestamp_list}
+        data_dict = {
+            timestamp_list.index(x): {
+                "id": timestamp_list.index(x),
+                "time_stamp": x,
+                "speed": speed[timestamp_list.index(x)],
+                "distance_km": distance_km[timestamp_list.index(x)],
+                "country": json_labels_list[timestamp_list.index(x)][2],
+                "image": f'image{random.randint(0, 1000)}.jpg'}
+            for x in timestamp_list
+        }
+
     with open('recording.json', 'w') as records_file:
         json.dump(data_dict, records_file)
 
@@ -49,8 +54,8 @@ def clear_database():
 def create_database():
     with sqlite3.connect('example.db') as conn:
         cur = conn.cursor()
-        cur.execute('''CREATE TABLE labeling (time timestamp, label varchar(50), confidence float)''')
-        cur.execute('''CREATE TABLE recording (time_stamp timestamp,
+        cur.execute('''CREATE TABLE labeling (id int, label varchar(50), confidence float)''')
+        cur.execute('''CREATE TABLE recording (id int, time_stamp timestamp,
         speed float, distance_km float, country varchar(50), image varchar(50))''')
 
         conn.commit()
@@ -63,7 +68,7 @@ def populate_database():
             data = json.loads(labels.read())
             for row in data.values():
                 cur.execute('INSERT INTO labeling values (?, ?, ?)',
-                            (row['time_stamp'], row['label'], row['confidence']))
+                            (row['id'], row['label'], row['confidence']))
             conn.commit()
 
     with open('recording.json', 'r') as labels:
@@ -71,8 +76,8 @@ def populate_database():
             cur = conn.cursor()
             data = json.loads(labels.read())
             for row in data.values():
-                cur.execute('INSERT INTO recording values (?, ?, ?, ?, ?)',
-                            (row['time_stamp'], row['speed'], row['distance_km'], row['country'], row['image']))
+                cur.execute('INSERT INTO recording values (?, ?, ?, ?, ?, ?)',
+                            (row['id'], row['time_stamp'], row['speed'], row['distance_km'], row['country'], row['image']))
             conn.commit()
 
 

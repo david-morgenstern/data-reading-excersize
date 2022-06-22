@@ -29,9 +29,9 @@ print("Distance taken in Germany (km): ", last_recorded['distance_diff'].sum())
 """
 with sqlite3.connect('example.db') as conn:
     pedestrian_slow_images = pd.read_sql_query("SELECT r.image FROM recording r LEFT JOIN labeling l ON "
-                                               "r.time_stamp = l.time  WHERE  r.speed < 1 AND l.label = 'car' ", conn)
-    animal_austria_images = pd.read_sql_query("SELECT r.image FROM recording r LEFT JOIN labeling l ON r.time_stamp = "
-                                              "l.time  WHERE  r.country = 'austria' AND l.label = 'animal'", conn)
+                                               "r.id = l.id  WHERE  r.speed < 1 AND l.label = 'car' ", conn)
+    animal_austria_images = pd.read_sql_query("SELECT r.image FROM recording r LEFT JOIN labeling l ON r.id = "
+                                              "l.id  WHERE  r.country = 'austria' AND l.label = 'animal'", conn)
 
 print("Images where car is slower than 1m/s", pedestrian_slow_images)
 print("Images where recording has image of animals in austria: ", animal_austria_images)

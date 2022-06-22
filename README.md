@@ -15,7 +15,7 @@
 - Python3
 - pandas
 - numpy
-- postgresql
+- MySql
 - mongodb
 - streamlit.io
 - fastApi
